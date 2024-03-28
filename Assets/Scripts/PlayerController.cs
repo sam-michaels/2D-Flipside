@@ -61,6 +61,7 @@ namespace TarodevController
 
             if (_frameInput.JumpDown)
             {
+                Debug.Log("Attempting to jump");
                 _jumpToConsume = true;
                 _timeJumpWasPressed = _time;
             }

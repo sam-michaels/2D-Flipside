@@ -11,6 +11,8 @@ public class CharacterController2D : MonoBehaviour
 	[SerializeField] private Transform m_GroundCheck;							// A position marking where to check if the player is grounded.
 	[SerializeField] private Transform m_CeilingCheck;							// A position marking where to check for ceilings
 	[SerializeField] private Collider2D m_CrouchDisableCollider;				// A collider that will be disabled when crouching
+	[SerializeField] private float airGravityScale = 3f; // Higher gravity when airborne
+	[SerializeField] private float airDeceleration = 0.95f; // Reduce horizontal speed by this factor when airborne
 
 	const float k_GroundedRadius = .2f; // Radius of the overlap circle to determine if grounded
 	private bool m_Grounded;            // Whether or not the player is grounded.
@@ -57,6 +59,13 @@ public class CharacterController2D : MonoBehaviour
 				if (!wasGrounded)
 					OnLandEvent.Invoke();
 			}
+		}
+		// Adjust gravity scale and apply air deceleration
+		if (!m_Grounded) {
+			m_Rigidbody2D.gravityScale = airGravityScale;
+			m_Rigidbody2D.velocity = new Vector2(m_Rigidbody2D.velocity.x * airDeceleration, m_Rigidbody2D.velocity.y);
+		} else {
+			m_Rigidbody2D.gravityScale = 1; // Reset to default gravity scale when grounded
 		}
 	}
 
@@ -142,5 +151,15 @@ public class CharacterController2D : MonoBehaviour
 		Vector3 theScale = transform.localScale;
 		theScale.x *= -1;
 		transform.localScale = theScale;
+	}
+	public bool IsGrounded() {
+
+		Collider2D[] colliders = Physics2D.OverlapCircleAll(m_GroundCheck.position, k_GroundedRadius, m_WhatIsGround);
+		for (int i = 0; i < colliders.Length; i++) {
+			if (colliders[i].gameObject != gameObject) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

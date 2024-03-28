@@ -57,5 +57,5 @@
     "Temp/": true
   },
   "dotnet.defaultSolution": "2D-Flipside.sln",
-  "cSpell.words": ["Behaviour"]
+  "cSpell.words": ["Behaviour", "mvnt", "Rigidbody"]
 }

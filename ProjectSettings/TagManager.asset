@@ -3,12 +3,13 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - SpawnPoint
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Player
   - Water
   - UI
   - 
@@ -44,7 +45,7 @@ TagManager:
   - name: background 2
     uniqueID: 3789438761
     locked: 0
-  - name: layer 3
+  - name: Water
     uniqueID: 2265070637
     locked: 0
   - name: Default
