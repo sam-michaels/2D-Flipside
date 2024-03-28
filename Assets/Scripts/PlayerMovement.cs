@@ -9,6 +9,7 @@ public class PlayerMovement : MonoBehaviour {
     public float mvntSpeed = 200f;
     public float sprintMultiplier = 1.2f;
     public float groundedGravityScale = 5f;
+    public float cutOffJumpForce = 5f;
     private float baseMvntSpeed;
 
     float horizontalMove = 0f;
@@ -27,6 +28,13 @@ public class PlayerMovement : MonoBehaviour {
         // jump check
         if (Input.GetButtonDown("Jump")) {
             jump = true;
+        }
+        // handle jump cutoff
+        if (Input.GetButtonUp("Jump") && !controller.IsGrounded()) {
+            if (rb.velocity.y > 0) { // If still ascending
+                rb.AddForce(Vector2.down * cutOffJumpForce, ForceMode2D.Impulse);
+            }
+        
         }
         // crouching functionality
         if (Input.GetButtonDown("Crouch")) {
