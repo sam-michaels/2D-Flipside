@@ -591,7 +591,7 @@ GameObject:
   m_Component:
   - component: {fileID: 102489276}
   - component: {fileID: 102489275}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Grid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2729,7 +2729,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 483775792}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -493.33066, y: -28.820164, z: -0.50664043}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -4076,9 +4076,10 @@ GameObject:
   - component: {fileID: 827444658}
   - component: {fileID: 827444657}
   - component: {fileID: 827444656}
+  - component: {fileID: 827444661}
   - component: {fileID: 827444660}
   - component: {fileID: 827444662}
-  - component: {fileID: 827444661}
+  - component: {fileID: 827444663}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -4104,18 +4105,47 @@ MonoBehaviour:
   m_AirControl: 1
   m_WhatIsGround:
     serializedVersion: 2
-    m_Bits: 39
+    m_Bits: 64
   m_GroundCheck: {fileID: 134715795}
   m_CeilingCheck: {fileID: 752966090}
-  m_CrouchDisableCollider: {fileID: 0}
+  m_CrouchDisableCollider: {fileID: 827444662}
   airGravityScale: 3
   airDeceleration: 0.95
+  maxAirborneSpeed: 10
+  maxSlopeAngle: 45
+  groundLayerMask:
+    serializedVersion: 2
+    m_Bits: 64
   OnLandEvent:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 827444661}
+        m_TargetAssemblyTypeName: PlayerMovement, Assembly-CSharp
+        m_MethodName: onLanding
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   OnCrouchEvent:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 827444661}
+        m_TargetAssemblyTypeName: PlayerMovement, Assembly-CSharp
+        m_MethodName: onCrouch
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!212 &827444657
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -4177,7 +4207,7 @@ Transform:
   m_GameObject: {fileID: 827444654}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 6.5, y: 1.15, z: -0.163}
+  m_LocalPosition: {x: 3, y: 9.21, z: -0.163}
   m_LocalScale: {x: 13.055649, y: 13.055649, z: 13.055649}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -4226,9 +4256,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rb: {fileID: 827444660}
   controller: {fileID: 827444656}
+  animator: {fileID: 827444663}
   mvntSpeed: 100
   sprintMultiplier: 1.5
   groundedGravityScale: 5
+  cutOffJumpForce: 5
 --- !u!70 &827444662
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -4264,6 +4296,27 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: -0.059853803}
   m_Size: {x: 0.14932944, y: 0.20001957}
   m_Direction: 0
+--- !u!95 &827444663
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 827444654}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 0099b39cb2c3340459fd6a91c3600303, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &874983369
 GameObject:
   m_ObjectHideFlags: 0
@@ -6469,7 +6522,7 @@ GameObject:
   - component: {fileID: 1378983252}
   - component: {fileID: 1378983255}
   - component: {fileID: 1378983254}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Tilemap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -108531,7 +108584,7 @@ TilemapCollider2D:
   m_GameObject: {fileID: 1378983250}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 139cd941569bffe4db74becc95c84293, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0

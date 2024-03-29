@@ -6,6 +6,7 @@ public class PlayerMovement : MonoBehaviour {
 
     public Rigidbody2D rb;
     public CharacterController2D controller;
+    public Animator animator;
     public float mvntSpeed = 200f;
     public float sprintMultiplier = 1.2f;
     public float groundedGravityScale = 5f;
@@ -18,6 +19,7 @@ public class PlayerMovement : MonoBehaviour {
 
     void Start() {
         baseMvntSpeed = mvntSpeed;
+        animator = GetComponent<Animator>();
     }
 
     // Update is called once per frame
@@ -25,9 +27,13 @@ public class PlayerMovement : MonoBehaviour {
         
         horizontalMove = Input.GetAxisRaw("Horizontal") * mvntSpeed;
 
+        animator.SetFloat("Speed", Mathf.Abs(horizontalMove));
+
         // jump check
         if (Input.GetButtonDown("Jump")) {
+
             jump = true;
+            animator.SetBool("isJump", true);
         }
         // handle jump cutoff
         if (Input.GetButtonUp("Jump") && !controller.IsGrounded()) {
@@ -58,6 +64,15 @@ public class PlayerMovement : MonoBehaviour {
         else {
             rb.gravityScale = 1;
         }
+    }
+    public void onLanding() {
+
+        animator.SetBool("isJump", false);
+    }
+    public void onCrouch(bool isCrouching) {
+        
+        animator.SetBool("isCrouch", isCrouching);
+
     }
     
     void FixedUpdate() {
