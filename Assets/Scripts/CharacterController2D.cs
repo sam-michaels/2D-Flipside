@@ -13,6 +13,9 @@ public class CharacterController2D : MonoBehaviour
 	[SerializeField] private Collider2D m_CrouchDisableCollider;				// A collider that will be disabled when crouching
 	[SerializeField] private float airGravityScale = 3f; // Higher gravity when airborne
 	[SerializeField] private float airDeceleration = 0.95f; // Reduce horizontal speed by this factor when airborne
+	[SerializeField] private float maxAirborneSpeed = 10f;
+	[SerializeField] private float maxSlopeAngle = 60f;
+	public LayerMask groundLayerMask;
 
 	const float k_GroundedRadius = .2f; // Radius of the overlap circle to determine if grounded
 	private bool m_Grounded;            // Whether or not the player is grounded.
@@ -62,11 +65,15 @@ public class CharacterController2D : MonoBehaviour
 		}
 		// Adjust gravity scale and apply air deceleration
 		if (!m_Grounded) {
-			m_Rigidbody2D.gravityScale = airGravityScale;
-			m_Rigidbody2D.velocity = new Vector2(m_Rigidbody2D.velocity.x * airDeceleration, m_Rigidbody2D.velocity.y);
-		} else {
-			m_Rigidbody2D.gravityScale = 1; // Reset to default gravity scale when grounded
-		}
+        	m_Rigidbody2D.gravityScale = airGravityScale;
+        
+        	// Clamp horizontal velocity to prevent being launched too far
+        	float clampedXVelocity = Mathf.Clamp(m_Rigidbody2D.velocity.x, -maxAirborneSpeed, maxAirborneSpeed);
+        	m_Rigidbody2D.velocity = new Vector2(clampedXVelocity, m_Rigidbody2D.velocity.y);
+    	} 
+		else {
+        	m_Rigidbody2D.gravityScale = 1; // Reset to default gravity scale when grounded
+    	}
 	}
 
 
@@ -133,12 +140,21 @@ public class CharacterController2D : MonoBehaviour
 			}
 		}
 		// If the player should jump...
-		if (m_Grounded && jump)
-		{
-			// Add a vertical force to the player.
-			m_Grounded = false;
+		if (m_Grounded && jump) {
+		    // Immediately reset vertical velocity before the jump
+			m_Rigidbody2D.velocity = new Vector2(m_Rigidbody2D.velocity.x, 0);
+
+			// Then, add the jump force
 			m_Rigidbody2D.AddForce(new Vector2(0f, m_JumpForce));
 		}
+
+		Vector2 velocity = new Vector2(move * 10f, m_Rigidbody2D.velocity.y);
+
+    	// Insert the HandleSlopes call here
+    	if (m_Grounded) {
+        	HandleSlopes(ref velocity);
+    	}
+
 	}
 
 
@@ -154,12 +170,34 @@ public class CharacterController2D : MonoBehaviour
 	}
 	public bool IsGrounded() {
 
-		Collider2D[] colliders = Physics2D.OverlapCircleAll(m_GroundCheck.position, k_GroundedRadius, m_WhatIsGround);
-		for (int i = 0; i < colliders.Length; i++) {
-			if (colliders[i].gameObject != gameObject) {
-				return true;
+		float characterWidth = GetComponent<Collider2D>().bounds.extents.x;
+		float rayLength = 0.5f; // Adjust based on your needs
+		bool grounded = false;
+
+		for (float i = -characterWidth; i <= characterWidth; i += characterWidth / 2) // Adjust step/count based on character width
+		{
+			Vector2 rayOrigin = new Vector2(transform.position.x + i, transform.position.y);
+			RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.down, rayLength, groundLayerMask);
+
+			Debug.DrawRay(rayOrigin, Vector2.down * rayLength, Color.red); // For debugging
+
+			if (hit.collider != null) {
+				grounded = true;
+				break; // Exit loop if ground is detected
 			}
 		}
-		return false;
+
+		return grounded;
+	}
+	private void HandleSlopes(ref Vector2 velocity) {
+
+		RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, Mathf.Infinity, groundLayerMask);
+		if (hit.collider != null) {
+			float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
+			if (slopeAngle <= maxSlopeAngle) {
+				// Adjust velocity based on slope angle
+				velocity.x += (hit.normal.x * -slopeAngle / maxSlopeAngle) * velocity.x;
+			}
+		}
 	}
 }
